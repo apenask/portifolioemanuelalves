@@ -58,9 +58,11 @@ O projeto inclui uma área restrita e protegida por autenticação para gerencia
 3. **Configurar variáveis de ambiente**:
    Crie um arquivo `.env` na raiz do projeto com as seguintes chaves:
    ```env
-   VITE_SUPABASE_URL="SUA_URL_DO_SUPABASE"
-   VITE_SUPABASE_ANON_KEY="SUA_KEY_ANON_DO_SUPABASE"
+   VITE_SUPABASE_URL=SUA_URL_DO_SUPABASE
+   VITE_SUPABASE_ANON_KEY=SUA_KEY_ANON_DO_SUPABASE
    ```
+
+> **Importante (Netlify):** não coloque essas variáveis entre aspas no painel de Environment Variables. Aspas extras podem gerar erro **401 Unauthorized** no Supabase.
 
 4. **Rodar o projeto**:
    ```bash
@@ -74,6 +76,62 @@ O projeto inclui uma área restrita e protegida por autenticação para gerencia
 - `src/lib`: Configurações de bibliotecas externas (Supabase, Utils).
 - `src/pages`: Páginas principais da aplicação.
 - `supabase/`: Scripts SQL para inicialização do banco de dados.
+
+## 🧪 Debug rápido de erro do Supabase (no navegador)
+
+Se quiser ver o erro real no **Console** (DevTools), rode:
+
+```js
+await window.debugSupabase()
+```
+
+
+Se aparecer `window.debugSupabase is not a function`:
+1. confirme que o deploy mais recente foi publicado,
+2. faça um hard refresh (Ctrl+F5),
+3. rode `typeof window.debugSupabase` (deve retornar `"function"`).
+
+### Script imediato (sem depender de `window.debugSupabase`)
+
+Cole este script no Console, aperte Enter e depois recarregue a página:
+
+```js
+(() => {
+  const originalFetch = window.fetch.bind(window);
+  window.fetch = async (...args) => {
+    const [input, init] = args;
+    const url = typeof input === 'string' ? input : input.url;
+    const res = await originalFetch(...args);
+
+    if (url.includes('/rest/v1/') || url.includes('/auth/v1/')) {
+      const clone = res.clone();
+      let body = '';
+      try {
+        body = await clone.text();
+      } catch {}
+
+      console.log('[SUPABASE DEBUG]', {
+        url,
+        method: init?.method || 'GET',
+        status: res.status,
+        ok: res.ok,
+        body
+      });
+    }
+
+    return res;
+  };
+
+  console.log('Supabase fetch logger ligado. Agora recarregue a página (Ctrl+F5).');
+})();
+```
+
+Esse comando retorna:
+- se URL/chave foram carregadas no build (`hasUrl`, `hasKey`),
+- prefixo da chave (sem expor a chave completa),
+- `statusCode`, `message` e `details` do Supabase.
+
+> Se vier `statusCode: "401"`, normalmente é chave `anon` inválida, errada, ou com aspas extras no ambiente de deploy.
 
 ## 📄 Licença
 
