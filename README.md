@@ -91,6 +91,41 @@ Se aparecer `window.debugSupabase is not a function`:
 2. faça um hard refresh (Ctrl+F5),
 3. rode `typeof window.debugSupabase` (deve retornar `"function"`).
 
+### Script imediato (sem depender de `window.debugSupabase`)
+
+Cole este script no Console, aperte Enter e depois recarregue a página:
+
+```js
+(() => {
+  const originalFetch = window.fetch.bind(window);
+  window.fetch = async (...args) => {
+    const [input, init] = args;
+    const url = typeof input === 'string' ? input : input.url;
+    const res = await originalFetch(...args);
+
+    if (url.includes('/rest/v1/') || url.includes('/auth/v1/')) {
+      const clone = res.clone();
+      let body = '';
+      try {
+        body = await clone.text();
+      } catch {}
+
+      console.log('[SUPABASE DEBUG]', {
+        url,
+        method: init?.method || 'GET',
+        status: res.status,
+        ok: res.ok,
+        body
+      });
+    }
+
+    return res;
+  };
+
+  console.log('Supabase fetch logger ligado. Agora recarregue a página (Ctrl+F5).');
+})();
+```
+
 Esse comando retorna:
 - se URL/chave foram carregadas no build (`hasUrl`, `hasKey`),
 - prefixo da chave (sem expor a chave completa),
