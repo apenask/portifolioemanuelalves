@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Oswald", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-gold-400: #FBBF24;
+  --color-gold-500: #F59E0B;
+  --color-gold-600: #D97706;
+  
+  --color-dark-900: #0A0A0A;
+  --color-dark-800: #171717;
+  --color-dark-700: #262626;
+}
+
+body {
+  background-color: var(--color-dark-900);
+  color: #F5F5F5;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
+  /* Ocultar barra de rolagem no Firefox e IE/Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Ocultar barra de rolagem no Chrome, Safari e Opera */
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+}
+
+.glass-panel {
+  background: rgba(23, 23, 23, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(to right, var(--color-gold-400), var(--color-gold-600));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
