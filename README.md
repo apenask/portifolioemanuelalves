@@ -77,6 +77,21 @@ O projeto inclui uma área restrita e protegida por autenticação para gerencia
 - `src/pages`: Páginas principais da aplicação.
 - `supabase/`: Scripts SQL para inicialização do banco de dados.
 
+## 🧪 Debug rápido de erro do Supabase (no navegador)
+
+Se quiser ver o erro real no **Console** (DevTools), rode:
+
+```js
+await window.debugSupabase()
+```
+
+Esse comando retorna:
+- se URL/chave foram carregadas no build (`hasUrl`, `hasKey`),
+- prefixo da chave (sem expor a chave completa),
+- `statusCode`, `message` e `details` do Supabase.
+
+> Se vier `statusCode: "401"`, normalmente é chave `anon` inválida, errada, ou com aspas extras no ambiente de deploy.
+
 ## 📄 Licença
 
 Este projeto é de uso privado para o atleta Emanuel Alves.
