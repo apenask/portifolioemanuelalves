@@ -4,18 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import { DataProvider } from './context/DataContext.tsx';
 import { AuthProvider } from './context/AuthContext.tsx';
-import { runSupabaseDebug } from './lib/supabase.ts';
 import './index.css';
-
-declare global {
-  interface Window {
-    debugSupabase?: typeof runSupabaseDebug;
-  }
-}
-
-if (typeof window !== 'undefined') {
-  window.debugSupabase = runSupabaseDebug;
-}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -26,5 +15,5 @@ createRoot(document.getElementById('root')!).render(
         </DataProvider>
       </AuthProvider>
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 );
