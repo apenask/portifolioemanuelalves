@@ -48,45 +48,39 @@ export const supabase = createClient(
   supabaseAnonKey || 'placeholder-key'
 );
 
-declare global {
-  interface Window {
-    debugSupabase?: () => Promise<{
-      env: {
-        hasUrl: boolean;
-        hasKey: boolean;
-        keyPrefix: string;
-      };
-      request: {
-        table: string;
-        ok: boolean;
-        statusCode: string | null;
-        message: string | null;
-        details: unknown;
-      };
-    }>;
-  }
-}
-
-if (typeof window !== 'undefined') {
-  window.debugSupabase = async () => {
-    const { error } = await supabase.from('athlete_profile').select('id').limit(1);
-
-    const result = {
-      env: {
-        hasUrl: Boolean(supabaseUrl),
-        hasKey: Boolean(supabaseAnonKey),
-        keyPrefix: supabaseAnonKey ? `${supabaseAnonKey.slice(0, 8)}...` : 'missing'
-      },
-      request: {
-        table: 'athlete_profile',
-        ok: !error,
-        statusCode: error?.code ?? null,
-        message: error?.message ?? null,
-        details: error?.details ?? null
-      }
-    };
-
-    console.log('Supabase debug result:', result);
-    return result;
+export interface SupabaseDebugResult {
+  env: {
+    hasUrl: boolean;
+    hasKey: boolean;
+    keyPrefix: string;
+  };
+  request: {
+    table: string;
+    ok: boolean;
+    statusCode: string | null;
+    message: string | null;
+    details: unknown;
   };
 }
+
+export const runSupabaseDebug = async (): Promise<SupabaseDebugResult> => {
+  const { error } = await supabase.from('athlete_profile').select('id').limit(1);
+
+  const result: SupabaseDebugResult = {
+    env: {
+      hasUrl: Boolean(supabaseUrl),
+      hasKey: Boolean(supabaseAnonKey),
+      keyPrefix: supabaseAnonKey ? `${supabaseAnonKey.slice(0, 8)}...` : 'missing'
+    },
+    request: {
+      table: 'athlete_profile',
+      ok: !error,
+      statusCode: error?.code ?? null,
+      message: error?.message ?? null,
+      details: error?.details ?? null
+    }
+  };
+
+  console.log('Supabase debug result:', result);
+  return result;
+};

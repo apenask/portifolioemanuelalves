@@ -85,6 +85,12 @@ Se quiser ver o erro real no **Console** (DevTools), rode:
 await window.debugSupabase()
 ```
 
+
+Se aparecer `window.debugSupabase is not a function`:
+1. confirme que o deploy mais recente foi publicado,
+2. faça um hard refresh (Ctrl+F5),
+3. rode `typeof window.debugSupabase` (deve retornar `"function"`).
+
 Esse comando retorna:
 - se URL/chave foram carregadas no build (`hasUrl`, `hasKey`),
 - prefixo da chave (sem expor a chave completa),
