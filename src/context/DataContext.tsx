@@ -130,6 +130,18 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
+
+const logSupabaseError = (context: string, error: { code?: string; message?: string } | null) => {
+  if (!error) return;
+  console.error(`${context} Error:`, error);
+
+  if (error.code === '401' || /invalid api key/i.test(error.message || '')) {
+    console.error(
+      'Supabase retornou 401 (não autorizado). Verifique se a VITE_SUPABASE_ANON_KEY está correta e sem aspas extras no deploy (Netlify).'
+    );
+  }
+};
+
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState<AthleteStat[]>([]);
@@ -148,6 +160,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       // Fetch Profile
       const { data: profileData, error: profileError } = await supabase.from('athlete_profile').select('*').limit(1).maybeSingle();
+      logSupabaseError('Profile', profileError);
       console.log("Profile Data:", profileData, "Error:", profileError);
       if (profileData) {
         setProfile({
@@ -182,7 +195,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       // Fetch Stats
       const { data: statsData, error: statsError } = await supabase.from('athlete_stats').select('*').order('display_order', { ascending: true });
-      if (statsError) console.error("Stats Error:", statsError);
+      logSupabaseError('Stats', statsError);
       if (statsData) {
         setStats(statsData.map(s => ({
           id: s.id, label: s.label, value: s.value, suffix: s.suffix || '', order: s.display_order, isVisible: s.is_visible
@@ -190,7 +203,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       // Fetch Timeline
-      const { data: timelineData } = await supabase.from('timeline_items').select('*').order('display_order', { ascending: true });
+      const { data: timelineData, error: timelineError } = await supabase.from('timeline_items').select('*').order('display_order', { ascending: true });
+      logSupabaseError('Timeline', timelineError);
       if (timelineData) {
         setTimeline(timelineData.map(t => ({
           id: t.id, yearLabel: t.year_label, title: t.title, description: t.description || '', order: t.display_order, isVisible: t.is_visible
@@ -198,7 +212,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       // Fetch Achievements
-      const { data: achievementsData } = await supabase.from('achievements').select('*').order('display_order', { ascending: true });
+      const { data: achievementsData, error: achievementsError } = await supabase.from('achievements').select('*').order('display_order', { ascending: true });
+      logSupabaseError('Achievements', achievementsError);
       if (achievementsData) {
         setAchievements(achievementsData.map(a => ({
           id: a.id, title: a.title, location: a.location || '', date: a.event_date || '', category: a.category || '',
@@ -211,7 +226,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       // Fetch Gallery Categories
-      const { data: catData } = await supabase.from('gallery_categories').select('*').order('display_order', { ascending: true });
+      const { data: catData, error: catError } = await supabase.from('gallery_categories').select('*').order('display_order', { ascending: true });
+      logSupabaseError('Gallery Categories', catError);
       if (catData) {
         setGalleryCategories(catData.map(c => ({
           id: c.id, name: c.name, slug: c.slug, order: c.display_order, isVisible: c.is_visible
@@ -219,7 +235,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       // Fetch Gallery Images
-      const { data: galleryData } = await supabase.from('gallery').select('*').order('display_order', { ascending: true });
+      const { data: galleryData, error: galleryError } = await supabase.from('gallery').select('*').order('display_order', { ascending: true });
+      logSupabaseError('Gallery', galleryError);
       if (galleryData) {
         setGallery(galleryData.map(g => ({
           id: g.id, title: g.title || '', caption: g.caption || '', url: g.image_url, categoryId: g.category_id || '',
@@ -228,7 +245,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       // Fetch Sponsors
-      const { data: sponsorsData } = await supabase.from('sponsors').select('*').order('display_order', { ascending: true });
+      const { data: sponsorsData, error: sponsorsError } = await supabase.from('sponsors').select('*').order('display_order', { ascending: true });
+      logSupabaseError('Sponsors', sponsorsError);
       if (sponsorsData) {
         setSponsors(sponsorsData.map(s => ({
           id: s.id, name: s.name, description: s.description || '', logoUrl: s.logo_url || '', link: s.external_link || '',
@@ -237,7 +255,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       // Fetch Support Section
-      const { data: supportData } = await supabase.from('support_section').select('*').limit(1).maybeSingle();
+      const { data: supportData, error: supportError } = await supabase.from('support_section').select('*').limit(1).maybeSingle();
+      logSupabaseError('Support Section', supportError);
       if (supportData) {
         setSupport({
           id: supportData.id, title: supportData.title || '', subtitle: supportData.subtitle || '', description: supportData.description || '',

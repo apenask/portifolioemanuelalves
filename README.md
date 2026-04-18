@@ -58,9 +58,11 @@ O projeto inclui uma área restrita e protegida por autenticação para gerencia
 3. **Configurar variáveis de ambiente**:
    Crie um arquivo `.env` na raiz do projeto com as seguintes chaves:
    ```env
-   VITE_SUPABASE_URL="SUA_URL_DO_SUPABASE"
-   VITE_SUPABASE_ANON_KEY="SUA_KEY_ANON_DO_SUPABASE"
+   VITE_SUPABASE_URL=SUA_URL_DO_SUPABASE
+   VITE_SUPABASE_ANON_KEY=SUA_KEY_ANON_DO_SUPABASE
    ```
+
+> **Importante (Netlify):** não coloque essas variáveis entre aspas no painel de Environment Variables. Aspas extras podem gerar erro **401 Unauthorized** no Supabase.
 
 4. **Rodar o projeto**:
    ```bash
